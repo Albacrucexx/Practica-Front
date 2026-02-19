@@ -1,75 +1,191 @@
-# React + TypeScript + Vite
+# Práctica 1 – React + TypeScript + SWAPI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 1. Descripción del proyecto
 
-Currently, two official plugins are available:
+El objetivo de esta práctica es desarrollar una aplicación web utilizando React y TypeScript que consuma datos reales desde la API pública SWAPI (Star Wars API).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+La aplicación permite:
 
-## React Compiler
+- Obtener personajes desde la API.
+- Mostrar los personajes en tarjetas.
+- Gestionar estados de carga y error.
+- Implementar paginación mediante un botón.
+- Aplicar una estética cuidada y estructurada.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
 
-Note: This will impact Vite dev & build performances.
+## 2. Tecnologías utilizadas
 
-## Expanding the ESLint configuration
+- React
+- TypeScript
+- Vite
+- Axios
+- CSS
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 3. Estructura del proyecto
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+src
+│
+├── api
+│ └── api.ts
+│
+├── components
+│ ├── index.tsx
+│ └── style.css
+│
+├── types
+│ ├── character.ts
+│ └── index.ts
+│
+├── App.tsx
+├── App.css
+├── main.tsx
+├── index.css
+│
+.env
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+yaml
+Copiar código
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 4. Instalación y ejecución
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 4.1 Clonar el repositorio
+
+```bash
+git clone URL_DEL_REPOSITORIO
+cd nombre-del-proyecto
+4.2 Instalar dependencias
+bash
+Copiar código
+npm install
+4.3 Configurar variables de entorno
+Crear un archivo .env en la raíz del proyecto con el siguiente contenido:
+
+ini
+Copiar código
+VITE_API_URL=https://swapi.dev/api
+Este archivo no se incluye en el repositorio por motivos de configuración y buenas prácticas.
+
+4.4 Ejecutar el proyecto
+bash
+Copiar código
+npm run dev
+El proyecto se ejecutará en:
+
+arduino
+Copiar código
+http://localhost:5173
+5. Funcionamiento de la aplicación
+5.1 Configuración de Axios
+En el archivo api/api.ts se crea una instancia de axios utilizando una variable de entorno como baseURL:
+
+ts
+Copiar código
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL
+});
+Esto permite separar la URL de la API del código principal y facilita futuras modificaciones.
+
+5.2 Gestión de estados en App.tsx
+En el componente principal se definen los siguientes estados:
+
+characters: almacena los personajes obtenidos.
+
+loading: indica si la aplicación está cargando datos.
+
+error: almacena posibles errores de la petición.
+
+nextPage: guarda la URL de la siguiente página para la paginación.
+
+5.3 Llamada inicial a la API
+Se utiliza el hook useEffect para realizar la primera petición al cargar la aplicación:
+
+ts
+Copiar código
+useEffect(() => {
+  fetchCharacters('/people/');
+}, []);
+La función fetchCharacters:
+
+Activa el estado de carga.
+
+Realiza la petición a la API.
+
+Acumula los personajes recibidos.
+
+Guarda la siguiente página.
+
+Gestiona posibles errores.
+
+Finaliza el estado de carga.
+
+5.4 Renderizado de componentes
+Los personajes se renderizan utilizando el componente Character:
+
+tsx
+Copiar código
+{characters.map((c, index) => (
+  <Character key={index} character={c} />
+))}
+El componente recibe un objeto tipado CharacterT, garantizando seguridad en el tipado mediante TypeScript.
+
+5.5 Paginación
+Si la API devuelve una URL en nextPage, se muestra el botón:
+
+tsx
+Copiar código
+{nextPage && !loading && (
+  <button onClick={() => fetchCharacters(nextPage)}>
+    Siguiente Página
+  </button>
+)}
+Esto permite cargar nuevos personajes sin recargar la página.
+
+6. Tipado con TypeScript
+En el directorio types se define el tipo CharacterT:
+
+ts
+Copiar código
+export type CharacterT = {
+  name: string;
+  gender: GenderT;
+  birth_year: string;
+};
+Esto garantiza que los datos utilizados en los componentes tengan la estructura esperada.
+
+7. Estética aplicada
+Se ha aplicado una estética cuidada basada en:
+
+Tarjetas diferenciadas mediante fondo y borde.
+
+Diseño en grid para distribución uniforme.
+
+Buen contraste entre texto y fondo.
+
+Jerarquía visual clara en el nombre del personaje.
+
+Espaciado coherente y ordenado.
+
+No se han utilizado librerías externas de estilos.
+
+8. Requisitos cumplidos
+Uso de TypeScript.
+
+Consumo de API real.
+
+Separación en componentes.
+
+Gestión de estados de carga y error.
+
+Implementación de paginación.
+
+Estructura modular.
+
+Diseño cuidado.
+
+9. Conclusión
+La aplicación cumple los requisitos técnicos establecidos en la práctica, demostrando el uso correcto de React para el consumo de APIs, la gestión de estados y la organización modular del código.git 
