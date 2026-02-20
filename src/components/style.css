@@ -1,0 +1,27 @@
+.characterContainer {
+  padding: 22px;
+  border: 2px solid #2563eb;
+  border-radius: 12px;
+  background-color: #111827;
+}
+
+/* Nombre del personaje */
+.characterContainer h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #3b82f6; /* azul */
+}
+
+/* Texto general (datos) */
+.characterContainer p {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #f3ce38; /* amarillo */
+}
+
+/* Palabras destacadas (Género:, Año nacimiento:) */
+.characterContainer strong {
+  color: #fa8734; /* naranja */
+}

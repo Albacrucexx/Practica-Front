@@ -1,191 +1,150 @@
-# Práctica 1 – React + TypeScript + SWAPI
+Práctica 1 – React + TypeScript + SWAPI
 
-## 1. Descripción del proyecto
+En esta práctica he desarrollado una aplicación web con React y TypeScript que consume datos reales desde la API pública SWAPI.
 
-El objetivo de esta práctica es desarrollar una aplicación web utilizando React y TypeScript que consuma datos reales desde la API pública SWAPI (Star Wars API).
+La aplicación obtiene personajes de Star Wars, los muestra en tarjetas y permite cargar más resultados mediante paginación. También gestiona correctamente los estados de carga y error.
 
-La aplicación permite:
+Tecnologías utilizadas:
 
-- Obtener personajes desde la API.
-- Mostrar los personajes en tarjetas.
-- Gestionar estados de carga y error.
-- Implementar paginación mediante un botón.
-- Aplicar una estética cuidada y estructurada.
+- React, para construir la interfaz basada en componentes.
 
----
+- TypeScript, para tipar los datos y trabajar de forma más segura.
 
-## 2. Tecnologías utilizadas
+- Vite, como entorno de desarrollo.
 
-- React
-- TypeScript
-- Vite
-- Axios
-- CSS
+- Axios, para realizar las peticiones HTTP.
 
----
+- CSS, para el diseño visual.
 
-## 3. Estructura del proyecto
+Configuración de la API: He creado una instancia de Axios en api/api.ts utilizando una variable de entorno como baseURL:
 
-src
-│
-├── api
-│ └── api.ts
-│
-├── components
-│ ├── index.tsx
-│ └── style.css
-│
-├── types
-│ ├── character.ts
-│ └── index.ts
-│
-├── App.tsx
-├── App.css
-├── main.tsx
-├── index.css
-│
-.env
+import axios from "axios";
 
-yaml
-Copiar código
-
----
-
-## 4. Instalación y ejecución
-
-### 4.1 Clonar el repositorio
-
-```bash
-git clone URL_DEL_REPOSITORIO
-cd nombre-del-proyecto
-4.2 Instalar dependencias
-bash
-Copiar código
-npm install
-4.3 Configurar variables de entorno
-Crear un archivo .env en la raíz del proyecto con el siguiente contenido:
-
-ini
-Copiar código
-VITE_API_URL=https://swapi.dev/api
-Este archivo no se incluye en el repositorio por motivos de configuración y buenas prácticas.
-
-4.4 Ejecutar el proyecto
-bash
-Copiar código
-npm run dev
-El proyecto se ejecutará en:
-
-arduino
-Copiar código
-http://localhost:5173
-5. Funcionamiento de la aplicación
-5.1 Configuración de Axios
-En el archivo api/api.ts se crea una instancia de axios utilizando una variable de entorno como baseURL:
-
-ts
-Copiar código
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL
 });
-Esto permite separar la URL de la API del código principal y facilita futuras modificaciones.
 
-5.2 Gestión de estados en App.tsx
-En el componente principal se definen los siguientes estados:
 
-characters: almacena los personajes obtenidos.
+La URL se define en el archivo .env:
 
-loading: indica si la aplicación está cargando datos.
+VITE_API_URL=https://swapi.dev/api
 
-error: almacena posibles errores de la petición.
 
-nextPage: guarda la URL de la siguiente página para la paginación.
+De esta forma, la URL de la API no está escrita directamente en el código, lo que facilita su modificación en el futuro.
 
-5.3 Llamada inicial a la API
-Se utiliza el hook useEffect para realizar la primera petición al cargar la aplicación:
+Gestión de estado en App.tsx: En el componente principal he definido varios estados con useState:
 
-ts
-Copiar código
+const [characters, setCharacters] = useState<CharacterT[]>([]);
+const [loading, setLoading] = useState<boolean>(false);
+const [error, setError] = useState<string | null>(null);
+const [nextPage, setNextPage] = useState<string | null>(null);
+
+
+- characters almacena los personajes recibidos.
+
+- loading controla cuándo mostrar el mensaje de carga.
+
+- error guarda posibles errores de la petición.
+
+- nextPage almacena la URL de la siguiente página para la paginación.
+
+Llamada inicial a la API: Uso useEffect para realizar la primera petición cuando el componente se monta:
+
 useEffect(() => {
-  fetchCharacters('/people/');
+  fetchCharacters("/people/");
 }, []);
-La función fetchCharacters:
 
-Activa el estado de carga.
 
-Realiza la petición a la API.
+El array vacío indica que solo se ejecuta una vez, al iniciar la aplicación.
 
-Acumula los personajes recibidos.
+Función fetchCharacters: La función encargada de hacer la petición es la siguiente:
 
-Guarda la siguiente página.
+const fetchCharacters = async (url: string) => {
+  try {
+    setLoading(true);
+    setError(null);
 
-Gestiona posibles errores.
+    const response = await api.get(url);
 
-Finaliza el estado de carga.
+    setCharacters(prev => [...prev, ...response.data.results]);
+    setNextPage(response.data.next);
 
-5.4 Renderizado de componentes
-Los personajes se renderizan utilizando el componente Character:
+  } catch (err) {
+    setError("Error al cargar personajes");
+  } finally {
+    setLoading(false);
+  }
+};
 
-tsx
-Copiar código
-{characters.map((c, index) => (
-  <Character key={index} character={c} />
-))}
-El componente recibe un objeto tipado CharacterT, garantizando seguridad en el tipado mediante TypeScript.
 
-5.5 Paginación
-Si la API devuelve una URL en nextPage, se muestra el botón:
+En esta función:
 
-tsx
-Copiar código
+- Activo el estado de carga.
+
+- Limpio posibles errores anteriores.
+
+- Realizo la petición con Axios.
+
+- Añado los nuevos personajes al estado anterior usando el operador spread.
+
+- Guardo la siguiente página que devuelve la API.
+
+- Si ocurre un error, lo guardo en el estado error.
+
+- Finalmente, desactivo el loading.
+
+Renderizado de personajes: Los personajes se muestran utilizando el componente Character:
+
+<div className="charactersContainer">
+  {characters.map((c, index) => (
+    <Character key={index} character={c} />
+  ))}
+</div>
+
+
+Uso map para recorrer el array y renderizar una tarjeta por cada personaje. El componente recibe el objeto tipado como CharacterT.
+
+También controlo los estados:
+
+{loading && <p>Cargando...</p>}
+{error && <p>{error}</p>}
+
+Paginación: Si la API devuelve una URL en nextPage, muestro un botón:
+
 {nextPage && !loading && (
   <button onClick={() => fetchCharacters(nextPage)}>
     Siguiente Página
   </button>
 )}
-Esto permite cargar nuevos personajes sin recargar la página.
 
-6. Tipado con TypeScript
-En el directorio types se define el tipo CharacterT:
+Al pulsarlo, se realiza otra petición sin recargar la página y se añaden los nuevos personajes al listado.
 
-ts
-Copiar código
+Tipado con TypeScript: En el directorio types he definido el tipo:
+
 export type CharacterT = {
   name: string;
-  gender: GenderT;
+  gender: string;
   birth_year: string;
 };
-Esto garantiza que los datos utilizados en los componentes tengan la estructura esperada.
 
-7. Estética aplicada
-Se ha aplicado una estética cuidada basada en:
 
-Tarjetas diferenciadas mediante fondo y borde.
+Esto garantiza que los componentes trabajen con datos estructurados correctamente y evita errores al acceder a propiedades.
 
-Diseño en grid para distribución uniforme.
+Conclusión:
 
-Buen contraste entre texto y fondo.
+- La aplicación cumple los requisitos de la práctica:
 
-Jerarquía visual clara en el nombre del personaje.
+- Consumo de una API real.
 
-Espaciado coherente y ordenado.
+- Uso de TypeScript.
 
-No se han utilizado librerías externas de estilos.
-
-8. Requisitos cumplidos
-Uso de TypeScript.
-
-Consumo de API real.
-
-Separación en componentes.
+- Separación en componentes.
 
 Gestión de estados de carga y error.
 
-Implementación de paginación.
+- Implementación de paginación.
 
-Estructura modular.
+- Diseño estructurado sin librerías externas.
 
-Diseño cuidado.
 
-9. Conclusión
-La aplicación cumple los requisitos técnicos establecidos en la práctica, demostrando el uso correcto de React para el consumo de APIs, la gestión de estados y la organización modular del código.git 
+
