@@ -1,5 +1,36 @@
 Práctica 1 – React + TypeScript + SWAPI
 
+Lo primero que hago es crear el proyecto correctamente desde terminal e instalando las dependencias: 
+
+┌──(kali㉿kali)-[~/Desktop]
+└─$ npm create vite@latest Practica1front
+
+> npx
+> create-vite react-ts-intro
+
+│
+◇  Select a framework:
+│  React
+│
+◇  Select a variant:
+│  TypeScript + React Compiler
+│
+◇  Use Vite 8 beta (Experimental)?:
+│  No
+│
+◇  Install with npm and start now?
+│  Yes
+│
+
+ kali㉿kali)-[~/Desktop]
+└─$ cd Practica1front
+                                                                             
+┌──(kali㉿kali)-[~/Desktop/react-ts-intro]
+└─$ code .
+
+Instalamos con npm install axios 
+Corremos con npm run dev
+
 En esta práctica he desarrollado una aplicación web con React y TypeScript que consume datos reales desde la API pública SWAPI.
 
 La aplicación obtiene personajes de Star Wars, los muestra en tarjetas y permite cargar más resultados mediante paginación. También gestiona correctamente los estados de carga y error.
@@ -146,5 +177,6 @@ Gestión de estados de carga y error.
 
 - Diseño estructurado sin librerías externas.
 
+Tuve un error, no estaba poniendo bien la url, la tenía que poner entera.
 
 
